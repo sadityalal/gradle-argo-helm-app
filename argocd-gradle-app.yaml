@@ -7,7 +7,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/sadityalal/gradle-helm-argocd
+    repoURL: https://github.com/sadityalal/gradle-argo-helm-app
     path: helm-chart
     targetRevision: main
     helm:
