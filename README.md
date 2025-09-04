@@ -22,37 +22,42 @@ It works in tandem with the [Application Repository](https://github.com/sadityal
 
 ```bash
 .
-├── helm-chart/
-│   ├── Chart.yaml           # Helm chart metadata
-│   ├── templates/           # Kubernetes templates (Deployment, Service, etc.)
-│   │   └── deployment.yaml
-│   ├── values-gradle.yaml   # Production environment values (used for testing/demo)
-│   └── values-gradle-dev.yaml # Development environment values (used for testing/demo)
-├── argo-app-dev.yaml        # ArgoCD Application manifest for dev
-├── argo-app-prod.yaml       # ArgoCD Application manifest for prod
+├── argocd-gradle-app.yaml
+├── Dockerfile                  # Build Docker Image
+├── gradle-app                  # Main application code
+│   ├── build
+│   ├── build.gradle
+│   ├── gradle
+│   ├── gradlew
+│   ├── gradlew.bat
+│   ├── settings.gradle
+│   └── src
+├── helm-chart                  # Helm Charts
+│   ├── Chart.yaml
+│   ├── templates
+│   └── values-gradle.yaml      # Values file
 └── README.md
 ```
 
 ## How It Works (Testing Setup)
 
 1. The **Application Repo** builds Docker images and pushes them to a registry.
-2. GitHub Actions in this **single-branch testing setup** updates the Helm chart **values files** (`values-gradle.yaml` and `values-gradle-dev.yaml`) with the latest image tag and repository.
+2. GitHub Actions in this **single-branch testing setup** updates the Helm chart **values file** (`values-gradle.yaml`) with the latest image tag and repository.
 3. **ArgoCD** watches this Helm repository and automatically deploys updates to Kubernetes:
 
 | Environment  | Branch | Helm Values File          | Kubernetes Namespace |
 |-------------|--------|--------------------------|--------------------|
-| Development | main   | values-gradle-dev.yaml   | backend-dev        |
 | Production  | main   | values-gradle.yaml       | backend            |
 
-> In production, we use **multi-branch workflows** (`develop` for dev, `main` for prod) and maintain Helm charts in a **separate repository**.
+> NOTE: In production, we use **multi-branch workflows** (`develop` for dev, `main` for prod) and maintain Helm charts in a **separate repository**.
 
 ## Deployment Instructions
 
 1. **Clone this repo**:
 
 ```bash
-git clone https://github.com/sadityalal/gradle-project-helm.git
-cd gradle-project-helm
+git clone https://github.com/sadityalal/gradle-argo-helm-app
+cd gradle-argo-helm-app
 ```
 
 2. Install ArgoCD on your Kubernetes cluster if not already installed.
@@ -62,4 +67,3 @@ cd gradle-project-helm
 ```bash
 kubectl apply -f argocd-gradle-app.yaml
 ```
-Ensure your application repository is configured to update image tags in this Helm repo via CI/CD (single-branch testing workflow).
